@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="spring.purchase.PurchaseDao">
+	
+	<resultMap id="userSelectMap" type="spring.domain.User">
+		<result property="userId" 			column="buyer_id" 			jdbcType="VARCHAR"/>
+		<result property="userName"	column="user_name" 	jdbcType="VARCHAR" />
+		<result property="password" 	column="password" 		jdbcType="VARCHAR" />
+		<result property="role" 				column="role" 					jdbcType="VARCHAR" />
+		<result property="ssn" 				column="ssn" 					jdbcType="VARCHAR" />
+		<result property="phone" 			column="cell_phone" 		jdbcType="VARCHAR" />
+		<result property="addr" 			column="addr" 				jdbcType="VARCHAR" />
+		<result property="email" 			column="email" 				jdbcType="NUMERIC"  />
+		<result property="regDate" 		column="u_reg_date" 			jdbcType="DATE" />
+	</resultMap>
+	
+	<resultMap type="spring.domain.Product" id="selectProductMap">
+		<result property="fileName" column="IMAGE_FILE" jdbcType="VARCHAR" />
+		<result property="prodNo" column="prod_no" jdbcType="INTEGER" />
+		<result property="prodName" column="prod_name" jdbcType="VARCHAR" />
+		<result property="prodDetail" column="prod_detail" jdbcType="VARCHAR" />
+		<result property="manuDate" column="MANUFACTURE_DAY" jdbcType="VARCHAR" />
+		<result property="price" column="price" jdbcType="INTEGER" />
+		<result property="proTranCode" column="TRAN_STATUS_CODE" jdbcType="CHAR" />
+		<result property="regDate" column="p_reg_date" jdbcType="DATE" />
+	</resultMap>
+	
+	<resultMap type="spring.domain.Purchase" id="selectPurchaseMap">
+		<result property="divyAddr" column="demailaddr" jdbcType="VARCHAR" />
+		<result property="divyDate" column="dlvy_date" jdbcType="DATE" />
+		<result property="divyRequest" column="dlvy_request" jdbcType="VARCHAR" />
+		<result property="orderDate" column="order_data" jdbcType="DATE" />
+		<result property="paymentOption" column="payment_option" jdbcType="CHAR" />
+		<result property="receiverName" column="receiver_name" jdbcType="VARCHAR" />
+		<result property="receiverPhone" column="receiver_phone" jdbcType="VARCHAR" />
+		<result property="tranCode" column="tran_status_code" jdbcType="CHAR" />
+		<result property="tranNo" column="tran_no" jdbcType="INTEGER" />
+		<association property="buyer" column="user_id" javaType="spring.domain.User" resultMap="userSelectMap" />
+		<association property="purchaseProd" column="prod_no" javaType="spring.domain.Product" resultMap="selectProductMap" />
+	</resultMap>
+	
+	<insert id="addPurchase" parameterType="spring.domain.Purchase">
+		INSERT INTO transaction 
+		VALUES ( seq_transaction_tran_no.nextval, 
+		#{purchaseProd.prodNo}, #{buyer.userId}, #{paymentOption:VARCHAR}, #{receiverName:VARCHAR}, #{receiverPhone:VARCHAR}, #{divyAddr:VARCHAR}, #{divyRequest:VARCHAR}, '0', #{divyDate:DATE}, sysdate )
+	</insert>
+	
+	<select id="getPurchase" parameterType="int" resultMap="selectPurchaseMap">
+		SELECT tran_no, t.prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date,
+				prod_name, prod_detail, manufacture_day, price, image_file, p.reg_date p_reg_date,
+				user_name, password, role, ssn, cell_phone, addr, email, u.reg_date u_reg_date
+				FROM transaction t, product p, users u
+				WHERE t.prod_no = p.prod_no AND t.buyer_id = u.user_id
+				AND tran_no = #{tranNo}
+	</select>
+	
+	<update id="updatePurchase" parameterType="spring.domain.Purchase">
+		UPDATE transaction 
+		SET payment_option = #{paymentOption:VARCHAR}, receiver_name = #{receiverName:VARCHAR}, receiver_phone = #{receiverPhone:VARCHAR}, demailaddr = #{divyAddr:VARCHAR}, dlvy_request = #{divyRequest:VARCHAR}, dlvy_date = #{divyDate:DATE} 
+		WHERE tran_no = #{tranNo}
+	</update>
+	
+	<update id="updateTranCodeByProdAction" parameterType="int">
+		UPDATE transaction SET tran_status_code = 1 WHERE prod_no = #{value}
+	</update>
+	
+	<update id="updateTranCode" parameterType="int">
+		UPDATE transaction SET tran_status_code = 2 WHERE tran_no = #{value}
+	</update>
+	
+	<select id="getPurchaseList" parameterType="java.util.Map" resultMap="selectPurchaseMap" >
+		SELECT * FROM
+				(SELECT tran_no, vt.prod_no, vt.buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, tran_status_code, order_data, dlvy_date,
+				prod_name, prod_detail, manufacture_day, price, image_file, p.reg_date p_reg_date,
+				user_name, password, role, ssn, cell_phone, addr, email, u.reg_date u_reg_date,
+				(SELECT COUNT(*) FROM transaction WHERE buyer_id = #{userId}) cnt, rownum rn
+				FROM
+				(SELECT * FROM transaction WHERE buyer_id = #{userId} ORDER BY TRAN_NO DESC) vt, product p, users u
+				WHERE vt.prod_no = p.prod_no AND vt.buyer_id = u.user_id
+				) vt2
+				WHERE rn between #{begin} AND #{end}
+	</select>
+	
+	<select id = "getTotalCount" parameterType="java.util.Map" resultType="int" >
+		SELECT COUNT(*) FROM transaction WHERE buyer_id = #{userId}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+

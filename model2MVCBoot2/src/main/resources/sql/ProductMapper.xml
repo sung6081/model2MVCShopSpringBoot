@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="spring.product.ProductDao">
+	
+	<resultMap type="spring.domain.Product" id="selectProductMap">
+		<result property="fileName" column="IMAGE_FILE" jdbcType="VARCHAR" />
+		<result property="prodNo" column="prod_no" jdbcType="INTEGER" />
+		<result property="prodName" column="prod_name" jdbcType="VARCHAR" />
+		<result property="prodDetail" column="prod_detail" jdbcType="VARCHAR" />
+		<result property="manuDate" column="MANUFACTURE_DAY" jdbcType="VARCHAR" />
+		<result property="price" column="price" jdbcType="INTEGER" />
+		<result property="proTranCode" column="TRAN_STATUS_CODE" jdbcType="CHAR" />
+		<result property="regDate" column="reg_date" jdbcType="DATE" />
+		<result property="cateNo" column="cate_no" jdbcType="INTEGER" />
+		<result property="cateName" column="cate_name" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<insert id="addProduct" parameterType="spring.domain.Product">
+		INSERT INTO product 
+		VALUES (seq_product_prod_no.nextval,
+		#{prodName}, #{prodDetail}, #{manuDate:VARCHAR}, #{price}, #{fileName:VARCHAR}, sysdate, #{cateNo:INTEGER})
+	</insert>
+	
+	<select id="getProduct" parameterType="int" resultMap="selectProductMap">
+		SELECT prod_no, prod_name, prod_detail, MANUFACTURE_DAY, price, image_file, reg_date, p.cate_no, cate_name, (SELECT TRAN_STATUS_CODE FROM transaction WHERE prod_no = #{prodNo}) TRAN_STATUS_CODE
+		FROM product p, category c
+		WHERE prod_no = #{prodNo} AND p.cate_no = c.cate_no(+)
+	</select>
+	
+	<update id="updateProduct" parameterType="spring.domain.Product">
+		UPDATE product 
+		<set> 
+			prod_name = #{prodName}, prod_detail = #{prodDetail}, cate_no = #{cateNo:INTEGER}, 
+			<if test="manuDate != null">
+				manufacture_day = #{manuDate:VARCHAR},
+			</if>
+			price = #{price}
+			<if test="fileName != null">
+				, image_file = #{fileName:VARCHAR} 
+			</if>
+		</set>
+		WHERE prod_no = #{prodNo}
+	</update>
+	
+	<sql id="selectProductListAll">
+		SELECT p.prod_no prod_no, prod_name, prod_detail, MANUFACTURE_DAY, price, image_file, reg_date, cate_no, TRAN_STATUS_CODE
+		FROM product p, transaction t
+		WHERE p.prod_no = t.prod_no(+)
+	</sql>
+	
+	<select id="getProductListAll" resultMap="selectProductMap">
+		<include refid="selectProductListAll"></include>
+		ORDER BY p.prod_no DESC
+	</select>
+	
+	<select id="getPageProductList" parameterType="spring.common.Search" resultMap="selectProductMap">
+		SELECT *
+		FROM (		SELECT inner_table. * ,  ROWNUM AS row_seq
+									FROM (	<include refid="selectProductListAll"></include>
+											ORDER BY p.prod_no DESC
+									 ) inner_table
+									WHERE ROWNUM <![CDATA[ <= ]]> #{currentPage:INTEGER } * #{pageSize:INTEGER } )
+		WHERE row_seq BETWEEN ( (#{currentPage:INTEGER } -1) * (#{pageSize:INTEGER } + 1)) AND (#{currentPage:INTEGER }  * #{pageSize:INTEGER })
+	</select>
+	
+	<update id="updateProdCategoryNull" parameterType="int">
+		UPDATE product SET cate_no = NULL WHERE cate_no = #{value}
+	</update>
+	
+	<select id="getProductList" parameterType="spring.common.Search" resultMap="selectProductMap">
+		SELECT *
+		FROM (		SELECT inner_table. * ,  ROWNUM AS row_seq
+									FROM (	<include refid="selectProductListAll"></include> 
+											<if test="menu == 'search'">
+												AND TRAN_STATUS_CODE IS NULL
+												</if>
+													<if test='searchCondition != null and searchKeyword != "" '>
+														<if test='searchCondition == "0" '>
+															AND INSTR( LOWER(p.prod_no), LOWER(#{searchKeyword:VARCHAR}) ) > 0
+														</if>
+														<if test='searchCondition == "1" '>
+															AND INSTR( LOWER(prod_name), LOWER(#{searchKeyword:VARCHAR}) ) > 0
+														</if>
+												</if>
+														<if test='searchCondition == "2" '>
+															<choose>
+																<when test="searchRange == null">
+																</when>
+																<when test='searchRange == "0"'>
+																	AND price = 0
+																</when>
+																<when test='searchRange == "1"'>
+																	AND price BETWEEN 1 AND 10000
+																</when>
+																<when test='searchRange == "2"'>
+																	AND price BETWEEN 10001 AND 100000
+																</when>
+																<when test='searchRange == "3"'>
+																	AND price BETWEEN 100001 AND 1000000
+																</when>
+																<when test='searchRange == "4"'>
+																	AND price > 1000000
+																</when>
+															</choose>
+														</if>
+														<if test="cateNo != 0">
+															AND cate_no = ${cateNo}
+														</if>
+												ORDER BY
+												<choose>
+													<when test='priceOption == "low"'>
+														price
+													</when>
+													<when test='priceOption == "high"'>
+														price DESC
+													</when>
+													<otherwise>
+														p.prod_no DESC
+													</otherwise>
+												</choose> 
+												 ) inner_table )
+		WHERE row_seq BETWEEN ( (#{currentPage:INTEGER } -1) * #{pageSize:INTEGER } + 1) AND (#{currentPage:INTEGER }  * #{pageSize:INTEGER })
+	</select>
+	
+	<select id="getTotalCount" parameterType="spring.common.Search" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+			<include refid="selectProductListAll"></include> 
+			<if test="menu == 'search'">
+				AND TRAN_STATUS_CODE IS NULL
+			</if>
+			<if test='searchCondition != null and searchKeyword != "" '>
+														<if test='searchCondition == "0" '>
+															AND INSTR( LOWER(p.prod_no), LOWER(#{searchKeyword:VARCHAR}) ) > 0
+														</if>
+														<if test='searchCondition == "1" '>
+															AND INSTR( LOWER(prod_name), LOWER(#{searchKeyword:VARCHAR}) ) > 0
+														</if>
+													</if>
+													<if test='searchCondition == "2" '>
+															<choose>
+																<when test="searchRange == null">
+																</when>
+																<when test='searchRange == "0"'>
+																	AND price = 0
+																</when>
+																<when test='searchRange == "1"'>
+																	AND price BETWEEN 1 AND 10000
+																</when>
+																<when test='searchRange == "2"'>
+																	AND price BETWEEN 10001 AND 100000
+																</when>
+																<when test='searchRange == "3"'>
+																	AND price BETWEEN 100001 AND 1000000
+																</when>
+																<when test='searchRange == "4"'>
+																	AND price > 1000000
+																</when>
+															</choose>
+														</if>
+														<if test="cateNo != 0">
+															AND cate_no = ${cateNo}
+														</if>
+													ORDER BY prod_no DESC
+		)
+	</select>
+	
+	<select id="getProdNameList" parameterType="string" resultType="string" >
+		SELECT prod_name from product WHERE INSTR(LOWER(prod_name), LOWER(#{value})) > 0
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+

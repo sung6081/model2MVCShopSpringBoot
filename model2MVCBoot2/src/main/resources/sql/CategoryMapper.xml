@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.product.ProductDao">
+
+	<resultMap type="spring.common.Category" id="CategoryResultMap">
+		<result column="cate_no" property="cateNo" jdbcType="INTEGER" />
+		<result column="cate_name" property="cateName" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="addCategory" parameterType="String" >
+		INSERT INTO category ( cate_no, cate_name )
+		VALUES ( SEQ_CATEGORY_CATE_NO.nextval, #{value} )
+	</insert>
+	
+	<select id="getCategoryList" resultMap="CategoryResultMap">
+		SELECT * FROM category
+	</select>
+	
+	<delete id="removeCategory" parameterType="int">
+		DELETE FROM category WHERE cate_no = #{value}
+	</delete>
+
+</mapper>
