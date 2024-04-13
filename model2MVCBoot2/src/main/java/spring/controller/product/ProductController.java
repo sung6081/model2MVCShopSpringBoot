@@ -29,12 +29,14 @@ import org.springframework.web.servlet.ModelAndView;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
+import lombok.extern.log4j.Log4j;
 import spring.common.Category;
 import spring.common.CommonProperties;
 import spring.common.Page;
 import spring.common.Search;
 import spring.domain.Product;
 import spring.domain.User;
+import spring.files.FileService;
 import spring.product.ProductService;
 import spring.product.impl.ProductServiceImpl;
 
@@ -47,6 +49,10 @@ public class ProductController {
 	private ProductService productService;
 	
 	@Autowired
+	@Qualifier("fileServiceImpl")
+	private FileService fileService;
+	
+	@Autowired
 	private CommonProperties common;
 	
 	@Autowired
@@ -54,6 +60,10 @@ public class ProductController {
 	
 	public ProductController() {
 		System.out.println("Default ProductController called");
+	}
+	
+	public void setFileService(FileService fileService) {
+		this.fileService = fileService;
 	}
 	
 	@RequestMapping("addPrdouctView")
@@ -73,36 +83,12 @@ public class ProductController {
 	}//end of addProductView
 
 	@RequestMapping("addProduct")
-	public ModelAndView addProductAction(@RequestPart(required = false) MultipartFile file,@ModelAttribute Product product,
+	public ModelAndView addProductAction(@RequestPart(required = false) List<MultipartFile> inputFiles,@ModelAttribute Product product,
 											@RequestParam String category) throws Exception {
 		
 		System.out.println("addProductAction start");
 		
 		ModelAndView modelAndView = new ModelAndView("/product/addProduct.jsp");
-		
-		System.out.println("fileName :"+file.getOriginalFilename()+"_");
-		
-		System.out.println("filePath:"+common.getUploadPath());
-		
-		if(file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
-			UUID uuid = UUID.randomUUID();
-			System.out.println("fileName :"+file.getOriginalFilename()+"_");
-			String extension = file.getOriginalFilename().split("\\.")[1];
-			String fileName = file.getOriginalFilename().split("\\.")[0] + uuid +"."+ extension;
-			product.setFileName(fileName);
-			
-			//File destination = new File(common.getUploadPath()+"\\"+fileName);
-			File destination = new File(resourceLoader.getResource(common.getUploadPath()).getFile(), fileName);
-			try {
-				file.transferTo(destination);
-			}catch(IOException e) {
-				e.printStackTrace();
-			}
-			
-		}else {
-			product.setFileName("no_image.png");
-			System.out.println("fileName :"+file.getOriginalFilename()+"_");
-		}
 		
 		System.out.println("_"+category+"_");
 		
@@ -112,6 +98,62 @@ public class ProductController {
 		}
 		
 		productService.addProduct(product);
+		
+		if( inputFiles == null) {
+			spring.domain.File inputFile = new spring.domain.File();
+			inputFile.setFileName("no_image.png");
+			inputFile.setProdNo(product.getProdNo());
+			fileService.addFile(inputFile);
+			modelAndView.addObject("product", product);
+			
+			System.out.println("addProductAction end");
+			
+			return modelAndView;
+		}
+		
+		if(inputFiles.size() == 0) {
+			spring.domain.File inputFile = new spring.domain.File();
+			inputFile.setFileName("no_image.png");
+			inputFile.setProdNo(product.getProdNo());
+			fileService.addFile(inputFile);
+			modelAndView.addObject("product", product);
+			
+			System.out.println("addProductAction end");
+			
+			return modelAndView;
+		}
+		
+		for(int i = 0; i < inputFiles.size(); i++) {
+			
+			MultipartFile file = inputFiles.get(i);
+		
+			System.out.println("fileName :"+file.getOriginalFilename()+"_");
+		
+			System.out.println("filePath:"+common.getUploadPath());
+			
+			if(file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
+				UUID uuid = UUID.randomUUID();
+				System.out.println("fileName :"+file.getOriginalFilename()+"_");
+				String extension = file.getOriginalFilename().split("\\.")[1];
+				String fileName = file.getOriginalFilename().split("\\.")[0] + uuid +"."+ extension;
+				product.setFileName(fileName);
+				
+				//File destination = new File(common.getUploadPath()+"\\"+fileName);
+				File destination = new File(resourceLoader.getResource(common.getUploadPath()).getFile(), fileName);
+				try {
+					file.transferTo(destination);
+				}catch(IOException e) {
+					e.printStackTrace();
+				}
+				
+				spring.domain.File inputFile = new spring.domain.File();
+				inputFile.setProdNo(product.getProdNo());
+				inputFile.setFileName(fileName);
+				fileService.addFile(inputFile);
+				
+			}
+		}
+		
 		modelAndView.addObject("product", product);
 		
 		System.out.println("addProductAction end");
@@ -127,11 +169,6 @@ public class ProductController {
 		System.out.println("getProductAction start");
 		
 		ModelAndView modelAndView = new ModelAndView("redirect:/user/loginView.jsp");
-		
-//		if(session.getAttribute("user") == null) {
-//			System.out.println("getProductAction end");
-//			return modelAndView;
-//		}
 		
 		if( request.getParameter("menu") != null && request.getParameter("menu").equals("manage")) {
 			modelAndView.setViewName("forward:/product/updateProductView");

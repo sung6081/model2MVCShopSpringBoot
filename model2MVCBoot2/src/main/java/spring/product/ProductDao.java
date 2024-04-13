@@ -11,7 +11,7 @@ import spring.domain.Product;
 @Mapper
 public interface ProductDao {
 
-	public void addProduct(Product product) throws Exception;
+	public int addProduct(Product product) throws Exception;
 	
 	public Product getProduct(int prodNo) throws Exception;
 	

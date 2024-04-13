@@ -1,6 +1,7 @@
 package spring.domain;
 
 import java.sql.Date;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +19,8 @@ public class Product {
 	private String proTranCode;
 	private String cateNo;
 	private String cateName;
+	
+	private List<File> files;
 	
 	public Product(){
 	}
@@ -90,6 +93,14 @@ public class Product {
 
 	public String getRegDateString() {
 		return regDateString;
+	}
+
+	public List<File> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<File> files) {
+		this.files = files;
 	}
 
 	@Override

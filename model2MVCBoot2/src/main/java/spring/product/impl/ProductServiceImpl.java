@@ -11,7 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import spring.common.Category;
 import spring.common.Search;
+import spring.domain.File;
 import spring.domain.Product;
+import spring.files.FileDao;
+import spring.files.FileService;
+import spring.files.impl.FileServiceImpl;
 import spring.product.ProductDao;
 import spring.product.ProductService;
 
@@ -22,8 +26,16 @@ public class ProductServiceImpl implements ProductService {
 	@Qualifier("productDao")
 	private ProductDao productDao;
 	
+	@Autowired
+	@Qualifier("fileServiceImpl")
+	private FileService fileService;
+	
 	public void setProductDao(ProductDao productDao) {
 		this.productDao = productDao;
+	}
+
+	public void setFileService(FileService fileService) {
+		this.fileService = fileService;
 	}
 
 	public ProductServiceImpl() {
@@ -33,16 +45,21 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	@Transactional
-	public void addProduct(Product product) throws Exception {
+	public int addProduct(Product product) throws Exception {
 		// TODO Auto-generated method stub
-		productDao.addProduct(product);
+		return productDao.addProduct(product);
 
 	}
 
 	@Override
 	public Product getProduct(int prodNo) throws Exception {
 		// TODO Auto-generated method stub
-		return productDao.getProduct(prodNo);
+		Product product = productDao.getProduct(prodNo);
+		List<File> files = fileService.getFilesList(prodNo);
+		
+		product.setFiles(files);
+		
+		return product;
 	}
 
 	@Override

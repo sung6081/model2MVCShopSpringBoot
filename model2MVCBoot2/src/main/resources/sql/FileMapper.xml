@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.files.FileDao">
+
+	<resultMap type="spring.domain.File" id="FileResultMapper">
+		<result column="file_no" property="fileNo" jdbcType="INTEGER" />
+		<result column="prod_no" property="prodNo" jdbcType="INTEGER" />
+		<result column="file_name" property="fileName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<insert id="addFile" parameterType="spring.domain.File" >
+		INSERT INTO files VALUES (seq_files_file_no.nextval, #{prodNo}, #{fileName})
+	</insert>
+	
+	<select id="getFilesList" parameterType="int" resultMap="FileResultMapper" >
+		SELECT * FROM files
+		<where>
+			prod_no = #{prodNo}
+		</where> 
+	</select>
+	
+	<update id="updateFile" parameterType="spring.domain.File" >
+		UPDATE files 
+		<set>
+			file_name = #{fileName}
+		</set>
+		<where>
+			file_no = #{fileNo}
+		</where>
+	</update>
+
+</mapper>

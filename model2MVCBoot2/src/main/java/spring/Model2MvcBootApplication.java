@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 
+import lombok.extern.log4j.Log4j;
+
 @EnableAspectJAutoProxy
 @SpringBootApplication
 @PropertySource(value="classpath:config/common.properties")

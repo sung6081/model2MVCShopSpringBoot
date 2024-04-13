@@ -9,7 +9,7 @@ import spring.domain.Product;
 
 public interface ProductService {
 
-	public void addProduct(Product product) throws Exception;
+	public int addProduct(Product product) throws Exception;
 	
 	public Product getProduct(int prodNo) throws Exception;
 	

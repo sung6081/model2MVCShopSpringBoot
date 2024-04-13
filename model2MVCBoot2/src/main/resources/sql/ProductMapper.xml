@@ -20,8 +20,11 @@
 	</resultMap>
 	
 	<insert id="addProduct" parameterType="spring.domain.Product">
+		<selectKey keyProperty="prodNo" resultType="int" order="BEFORE" >
+			SELECT seq_product_prod_no.nextval FROM dual
+		</selectKey>
 		INSERT INTO product 
-		VALUES (seq_product_prod_no.nextval,
+		VALUES (#{prodNo},
 		#{prodName}, #{prodDetail}, #{manuDate:VARCHAR}, #{price}, #{fileName:VARCHAR}, sysdate, #{cateNo:INTEGER})
 	</insert>
 	
