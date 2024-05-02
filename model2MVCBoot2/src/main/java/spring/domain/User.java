@@ -111,7 +111,10 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "UserVO : [userId] "+userId+" [userName] "+userName+" [password] "+password+" [role] "+ role
-			+" [ssn] "+ssn+" [phone] "+phone+" [email] "+email+" [regDate] "+regDate +" [regDateString] "+regDateString;
+		return "User [userId=" + userId + ", userName=" + userName + ", password=" + password + ", role=" + role
+				+ ", ssn=" + ssn + ", phone=" + phone + ", addr=" + addr + ", email=" + email + ", regDateString="
+				+ regDateString + ", regDate=" + regDate + ", phone1=" + phone1 + ", phone2=" + phone2 + ", phone3="
+				+ phone3 + "]";
 	}
+	
 }

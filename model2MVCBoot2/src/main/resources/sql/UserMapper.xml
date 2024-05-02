@@ -40,6 +40,7 @@
 	   	UPDATE users
 	   	<set>
 	   		user_name 	= #{userName:VARCHAR} ,
+	   		password	= #{password:VARCHAR},
 			cell_phone	= #{phone:VARCHAR},
 			addr 				= #{addr:VARCHAR} ,
 			email				=	#{email:VARCHAR}

@@ -116,20 +116,22 @@
 	<tr>
 		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
 	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			상품이미지 
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<f:forEach var="file" items="${product.files }" >
+	<f:forEach var="file" items="${product.files }" >
+		<tr>
+			<td width="104" class="ct_write">
+				상품이미지 
+			</td>
+			<td bgcolor="D6D6D6" width="1"></td>
+			
 			<td class="ct_write01">
 				<img src = "/images/uploadFiles/${file.fileName }" width="100" height="100"/>
 			</td>
-		</f:forEach>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
+			
+		</tr>
+		<tr>
+			<td height="1" colspan="3" bgcolor="D6D6D6"></td>
+		</tr>
+	</f:forEach>
 	<tr>
 		<td width="104" class="ct_write">
 			상품상세정보 <img src="/images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>

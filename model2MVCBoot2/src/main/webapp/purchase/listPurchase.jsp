@@ -195,7 +195,7 @@ function fncGetPurchaseList(currentPage) {
 				<input type="hidden" name="prodNo" value="${purchase.purchaseProd.prodNo }" >
 		</td>
 		<td class="ct_line02"></td>
-		<td align="center"><img src = "/images/uploadFiles/${purchase.purchaseProd.fileName }" width="50" height="50"/></td>
+		<td align="center"><img src = "/images/uploadFiles/${purchase.purchaseProd.files[0].fileName }" width="50" height="50"/></td>
 		<td class="ct_line02"></td>
 		<td align="center">${purchase.receiverPhone }<%-- purchaseVO.getReceiverPhone() --%></td>
 		<td class="ct_line02"></td>

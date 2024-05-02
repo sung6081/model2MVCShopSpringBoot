@@ -65,6 +65,7 @@
 	<jsp:include page="/layout/navigationBar.jsp" />
    	<!-- ToolBar End /////////////////////////////////////-->
 
+<div class="container">
 <table width="100%" height="37" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td width="15" height="37">
@@ -149,6 +150,7 @@
 	<tr>
 		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
 	</tr>
+	<f:forEach var="file" items="${product.files }" >
 	<tr>
 		<td width="104" class="ct_write">상품이미지</td>
 		<td bgcolor="D6D6D6" width="1"></td>
@@ -166,6 +168,7 @@
 	<tr>
 		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
 	</tr>
+	</f:forEach>
 </table>
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
@@ -199,6 +202,7 @@
 		</td>
 	</tr>
 </table>
+</div>
 
 </body>
 </html>

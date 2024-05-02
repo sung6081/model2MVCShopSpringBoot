@@ -71,6 +71,10 @@ public class ProductServiceImpl implements ProductService {
 		System.out.println("dao categoryList : "+listCategory);
 		
 		for(int i = 0; i < list.size(); i++) {
+			
+			List<File> files = fileService.getFilesList(list.get(i).getProdNo());
+			list.get(i).setFiles(files);
+			
 			if(list.get(i).getProTranCode() != null)
 				list.get(i).setProTranCode(list.get(i).getProTranCode().trim());
 		}

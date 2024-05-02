@@ -1,6 +1,7 @@
 <!-- 상품목록조회 -->
 
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%@page import="spring.common.Page"%>
 <%@page import="java.util.Map"%>
@@ -25,7 +26,6 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-  	<link rel="stylesheet" href="/resources/demos/style.css">
   	<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
@@ -521,7 +521,33 @@ $(function() {
 	<f:forEach var="product" items="${list }">
 	<div class="col-xs-4">
 	<div class="thumbnail">
-          <img class="product-image" src="/images/uploadFiles/${product.fileName }" alt="Generic placeholder thumbnail">
+		  
+		  <!-- carousel 사용부분 -->
+		  <!-- <div id="carousel-example-generic-${product.prodNo} }" class="carousel slide" data-ride="carousel" >
+		  	<ol class="carousel-indicators" >
+		  	<f:forEach var="i" begin="0" end="${fn:length(product.files) - 1 }" >
+		  		<li data-target="#carousel-example-generic-${product.prodNo}" data-slide-to="${i }" ${i eq 1 ? "class='active'" : "" } ></li>
+		  	</f:forEach>
+		  	</ol>
+		  	<div class="carousel-inner" role="listbox" >
+		  		<f:forEach var="i" begin="0" end="${fn:length(product.files) - 1 }">
+		  			<div ${i eq 0 ? "class='item active'" : "class='item'" } >
+		  				<img class="d-block w-100" src="/images/uploadFiles/${product.files[i].fileName }" alt="Generic placeholder thumbnail">
+		  			</div>
+		  		</f:forEach>
+		  	</div>
+		  	<!-- 화살표 표시 -->
+		  	<!-- <a class="left carousel-control" href="#carousel-example-generic-${product.prodNo}" role="button" data-slide="prev">
+	          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+	          <span class="sr-only">Previous</span>
+	        </a>
+	        <a class="right carousel-control" href="#carousel-example-generic-${product.prodNo}" role="button" data-slide="next">
+	          <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+	          <span class="sr-only">Next</span>
+	        </a>
+		  	</div> -->
+          	<img class="product-image" src="/images/uploadFiles/${product.files[0].fileName }" alt="Generic placeholder thumbnail">
+          
           <div class="caption">
             <h3>${product.prodName }</h3>
             <p><a href="javascript:getProduct(${product.prodNo })" class="btn btn-primary" role="button" >상세정보보기</a></p>
@@ -571,5 +597,8 @@ $(function() {
 </form>
 </footer>
 </div>
+
+
+
 </body>
 </html>

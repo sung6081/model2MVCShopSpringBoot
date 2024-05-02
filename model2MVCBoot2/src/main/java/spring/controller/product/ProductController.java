@@ -3,6 +3,7 @@ package spring.controller.product;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -99,11 +100,15 @@ public class ProductController {
 		
 		productService.addProduct(product);
 		
+		List<spring.domain.File> prodFiles = new ArrayList<spring.domain.File>();
+		
 		if( inputFiles == null) {
 			spring.domain.File inputFile = new spring.domain.File();
 			inputFile.setFileName("no_image.png");
 			inputFile.setProdNo(product.getProdNo());
 			fileService.addFile(inputFile);
+			prodFiles.add(inputFile);
+			product.setFiles(prodFiles);
 			modelAndView.addObject("product", product);
 			
 			System.out.println("addProductAction end");
@@ -116,6 +121,8 @@ public class ProductController {
 			inputFile.setFileName("no_image.png");
 			inputFile.setProdNo(product.getProdNo());
 			fileService.addFile(inputFile);
+			prodFiles.add(inputFile);
+			product.setFiles(prodFiles);
 			modelAndView.addObject("product", product);
 			
 			System.out.println("addProductAction end");
@@ -139,7 +146,7 @@ public class ProductController {
 				product.setFileName(fileName);
 				
 				//File destination = new File(common.getUploadPath()+"\\"+fileName);
-				File destination = new File(resourceLoader.getResource(common.getUploadPath()).getFile(), fileName);
+				File destination = new File(common.getUploadPath(), fileName);
 				try {
 					file.transferTo(destination);
 				}catch(IOException e) {
@@ -150,6 +157,8 @@ public class ProductController {
 				inputFile.setProdNo(product.getProdNo());
 				inputFile.setFileName(fileName);
 				fileService.addFile(inputFile);
+				prodFiles.add(inputFile);
+				product.setFiles(prodFiles);
 				
 			}
 		}
@@ -368,6 +377,10 @@ public class ProductController {
 		ModelAndView modelAndView = new ModelAndView();
 		
 		Product product = productService.getProduct(Integer.parseInt(request.getParameter("prodNo")));
+		
+		List<spring.domain.File> files = fileService.getFilesList(Integer.parseInt(request.getParameter("prodNo")));
+		
+		product.setFiles(files);
 		
 		request.setAttribute("product", product);
 		

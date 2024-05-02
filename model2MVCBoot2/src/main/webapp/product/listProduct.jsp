@@ -453,7 +453,9 @@ $(function() {
 				</td>
 			</f:if>
 		<td class="ct_line02"></td>
-		<td align="center"><img src = "/images/uploadFiles/${product.fileName }" width="50" height="50"/></td>
+		
+		<td align="center"><img src = "/images/uploadFiles/${product.files[0].fileName }" width="50" height="50"/></td>
+		
 		<td class="ct_line02"></td>
 		<td align="center">${product.price }<%-- productVO.getPrice() --%></td>
 		<td class="ct_line02"></td>

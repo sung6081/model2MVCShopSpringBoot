@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import spring.domain.Purchase;
+import spring.files.FileService;
 import spring.purchase.PurchaseDao;
 import spring.purchase.PurchaseService;
 
@@ -20,10 +21,18 @@ public class PurchaseServiceImpl implements PurchaseService {
 	@Qualifier("purchaseDao")
 	private PurchaseDao purchaseDao;
 	
+	@Autowired
+	@Qualifier("fileServiceImpl")
+	private FileService fileService;
+	
 	public void setPurchaseDao(PurchaseDao purchaseDao) {
 		this.purchaseDao = purchaseDao;
 	}
 
+	public void setFileService(FileService fileService) {
+		this.fileService = fileService;
+	}
+	
 	public PurchaseServiceImpl() {
 		// TODO Auto-generated constructor stub
 		System.out.println("Default PurchaseServiceImpl Constructor call...");
@@ -60,6 +69,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 		
 		for(int i = 0; i < list.size(); i++) {
 			list.get(i).setTranCode(list.get(i).getTranCode().trim());
+			list.get(i).getPurchaseProd().setFiles(fileService.getFilesList(list.get(i).getPurchaseProd().getProdNo()));
 		}
 		
 		int totalCount = purchaseDao.getTotalCount(map);

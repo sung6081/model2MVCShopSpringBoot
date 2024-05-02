@@ -1,6 +1,5 @@
 package spring.controller.product;
 
-import java.io.File;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,9 @@ import spring.common.Category;
 import spring.common.CommonProperties;
 import spring.common.Page;
 import spring.common.Search;
+import spring.domain.File;
 import spring.domain.Product;
+import spring.files.FileService;
 import spring.product.ProductService;
 import spring.product.impl.ProductServiceImpl;
 
@@ -46,6 +47,14 @@ public class ProductRestController {
 	
 	@Autowired
 	private CommonProperties common;
+	
+	@Autowired
+	@Qualifier("fileServiceImpl")
+	private FileService fileService;
+	
+	public void setFileService(FileService fileService) {
+		this.fileService = fileService;
+	}
 	
 	public ProductRestController() {
 		System.out.println("Default ProductRestController call...");
@@ -86,6 +95,7 @@ public class ProductRestController {
 		System.out.println("getProductAction start");
 		
 		Product product = productService.getProduct(prodNo);
+		List<File> files = fileService.getFilesList(prodNo);
 		
 		System.out.println("getProductAction Realend");
 		
